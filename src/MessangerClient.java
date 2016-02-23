@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
+import java.math.BigInteger;
 import java.net.Socket;
 
 /**
@@ -15,8 +16,10 @@ public class MessangerClient extends JFrame{
     private JTextArea messagesTextArea;
     private JTextField messageTxt;
     private PrintWriter writer;
+    private BufferedReader reader;
 
     MessangerClient(){
+        setVisible(true);
         setBounds(new Rectangle(400, 400));
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BorderLayout());
@@ -25,6 +28,7 @@ public class MessangerClient extends JFrame{
         topPanel.add(messagesTextArea, BorderLayout.CENTER);
         JPanel bottomPanel = new JPanel(new BorderLayout());
         messageTxt = new JTextField(20);
+        messageTxt.requestFocus();
         bottomPanel.add(messageTxt, BorderLayout.CENTER);
         JButton sendBtn = new JButton("Send");
         sendBtn.addActionListener(new SendButtonListener());
@@ -33,14 +37,37 @@ public class MessangerClient extends JFrame{
         add(topPanel, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
         setUpNetworking();
+        new Thread(new InCommingReader()).start();
+        setVisible(true);
     }
 
     public void setUpNetworking(){
         try {
             socket = new Socket("127.0.0.1", 9090);
+            reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             writer = new PrintWriter(socket.getOutputStream());
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private class InCommingReader implements Runnable{
+
+        @Override
+        public void run() {
+            String message;
+            try {
+                System.out.println(reader);
+                while((message = reader.readLine()) != null){
+                    System.out.println("ınComming while");
+                    messagesTextArea.append(message);
+                    System.out.println(message);
+                    
+                }
+                System.out.println("exit");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -50,17 +77,13 @@ public class MessangerClient extends JFrame{
         public void actionPerformed(ActionEvent e) {
             writer.println(messageTxt.getText());
             writer.flush();
-            System.out.println(messageTxt.getText());
+            messageTxt.setText("");
+            messageTxt.requestFocus();
         }
-    }
-    private void go() {
-        MessangerClient frame = new MessangerClient();
-        frame.setVisible(true);
-
     }
 
     public static void main(String args[]){
-        new MessangerClient().go();
+        new MessangerClient();
     }
 
 }

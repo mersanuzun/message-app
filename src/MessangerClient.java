@@ -17,6 +17,7 @@ public class MessangerClient extends JFrame{
     private JTextField messageTxt;
     private PrintWriter writer;
     private BufferedReader reader;
+    private String username;
 
     MessangerClient(){
         setVisible(true);
@@ -36,9 +37,16 @@ public class MessangerClient extends JFrame{
         bottomPanel.add(sendBtn, BorderLayout.EAST);
         add(topPanel, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
+        assignUsername();
         setUpNetworking();
+        writer.println("firstVisit" + this.username);
+        writer.flush();
         new Thread(new InCommingReader()).start();
         setVisible(true);
+    }
+
+    private void assignUsername(){
+        this.username = JOptionPane.showInputDialog("Please type a username");
     }
 
     public void setUpNetworking(){
@@ -59,9 +67,7 @@ public class MessangerClient extends JFrame{
             try {
                 System.out.println(reader);
                 while((message = reader.readLine()) != null){
-                    System.out.println("ınComming while");
-                    messagesTextArea.append(message);
-                    System.out.println(message);
+                    messagesTextArea.append(message + "\n");
 
                 }
                 System.out.println("exit");

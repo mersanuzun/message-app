@@ -62,7 +62,7 @@ public class MessangerClient extends JFrame{
                     System.out.println("ınComming while");
                     messagesTextArea.append(message);
                     System.out.println(message);
-                    
+
                 }
                 System.out.println("exit");
             } catch (IOException e) {

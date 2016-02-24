@@ -21,7 +21,7 @@ public class MessengerServer extends Thread{
             while(true){
                 Socket socket = serverSocket.accept();
                 System.out.println(socket.toString());
-                clientsOutputStreams.add(new PrintWriter(socket.getOutputStream()));
+                clientsOutputStreams.add(new PrintWriter(socket.getOutputStream(), true));
                 new Thread(new ClientHandler(socket)).start();
                 System.out.println("Got a connection.");
             }
@@ -56,14 +56,12 @@ public class MessengerServer extends Thread{
         }
 
         private void tellEveryone(String message) {
-            System.out.println(clientsOutputStreams.size());
             for(PrintWriter writer : clientsOutputStreams){
                 System.out.println(writer);
-                writer.print(message);
+                writer.print(message + "\n");
                 writer.flush();
                 System.out.println("sended");
             }
-            clientsOutputStreams.get(0).close();
         }
     }
 
